@@ -2529,10 +2529,12 @@ void TParseContext::globalQualifierTypeCheck(const TSourceLoc& loc, const TQuali
 
     // now, knowing it is a shader in/out, do all the in/out semantic checks
 
+#ifdef NO_GL_ARB_SHADER_BALLOT
     if (publicType.basicType == EbtBool) {
         error(loc, "cannot be bool", GetStorageQualifierString(qualifier.storage), "");
         return;
     }
+#endif  /* NO_GL_ARB_SHADER_BALLOT */
 
     if (publicType.basicType == EbtInt || publicType.basicType == EbtUint || publicType.basicType == EbtDouble)
         profileRequires(loc, EEsProfile, 300, nullptr, "shader input/output");

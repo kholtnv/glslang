@@ -1320,6 +1320,10 @@ public:
         case EbtInt:
         case EbtUint:
         case EbtBool:
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+        case EbtInt64:
+        case EbtUint64:
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
             return true;
         default:
             break;
@@ -1414,6 +1418,10 @@ public:
         case EbtSampler:           return "sampler/image";
         case EbtStruct:            return "structure";
         case EbtBlock:             return "block";
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+        case EbtInt64:             return "int64_t";
+        case EbtUint64:            return "uint64_t";
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         default:                   return "unknown type";
         }
     }
