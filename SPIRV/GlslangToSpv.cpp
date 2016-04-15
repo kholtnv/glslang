@@ -3347,6 +3347,17 @@ spv::Id TGlslangToSpvTraverser::createConversion(glslang::TOperator op, spv::Dec
     case glslang::EOpConvDoubleToUint:
         convOp = spv::OpConvertFToU;
         break;
+
+#ifndef NO_GL_GPU_SHADER_INT64
+    // Truncate or zero extend conversions
+    case glslang::EOpConvUint:
+        convOp = spv::OpUConvert;
+        break;
+    case glslang::EOpConvInt:
+        convOp = spv::OpSConvert;
+        break;
+#endif /* NO_GL_GPU_SHADER_INT64 */
+
     default:
         break;
     }

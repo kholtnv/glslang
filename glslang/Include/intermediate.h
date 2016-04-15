@@ -97,6 +97,10 @@ enum TOperator {
     EOpConvUintToDouble,
     EOpConvFloatToDouble,
     EOpConvBoolToDouble,
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+    EOpConvInt,
+    EOpConvUint,
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
 
     //
     // binary operations
