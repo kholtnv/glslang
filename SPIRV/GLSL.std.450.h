@@ -125,6 +125,11 @@ enum GLSLstd450 {
     GLSLstd450NMax = 80,
     GLSLstd450NClamp = 81,
 
+#ifndef NO_GL_ARB_SHADER_BALLOT
+    GLSLstd450readFirstInvocationARB = 82,
+    GLSLstd450readInvocationARB = 83,
+#endif /* NO_GL_ARB_SHADER_BALLOT */
+
     GLSLstd450Count
 };
 

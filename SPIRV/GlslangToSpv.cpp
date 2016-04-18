@@ -2776,6 +2776,12 @@ spv::Id TGlslangToSpvTraverser::createBinaryOperation(glslang::TOperator op, spv
     case glslang::EOpVectorNotEqual:
         comparison = true;
         break;
+#ifndef NO_GL_ARB_gpu_shader_int64
+    case glslang::EOpreadInvocationARB:
+        assert(0); // TBD
+        // libCall = spv::GLSLstd450readInvocationARB;
+        break;
+#endif /* NO_GL_ARB_gpu_shader_int64 */
     default:
         break;
     }
@@ -3217,6 +3223,11 @@ spv::Id TGlslangToSpvTraverser::createUnaryOperation(glslang::TOperator op, spv:
         else
             libCall = spv::GLSLstd450FindSMsb;
         break;
+#ifndef NO_GL_ARB_gpu_shader_int64
+    case glslang::EOpreadFirstInvocationARB:
+        libCall = spv::GLSLstd450readFirstInvocationARB;
+        break;
+#endif /* NO_GL_ARB_gpu_shader_int64 */
 
     default:
         return 0;
