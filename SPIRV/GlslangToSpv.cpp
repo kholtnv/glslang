@@ -454,6 +454,15 @@ spv::BuiltIn TGlslangToSpvTraverser::TranslateBuiltInDecoration(glslang::TBuiltI
     case glslang::EbvLocalInvocationId:    return spv::BuiltInLocalInvocationId;
     case glslang::EbvLocalInvocationIndex: return spv::BuiltInLocalInvocationIndex;
     case glslang::EbvGlobalInvocationId:   return spv::BuiltInGlobalInvocationId;
+#ifndef NO_GL_ARB_SHADER_BALLOT
+    case glslang::EbvSubGroupSizeARB:      return spv::BuiltInSubgroupSize;
+    case glslang::EbvSubGroupInvocationARB:return spv::BuiltInSubgroupLocalInvocationId;
+    case glslang::EbvSubGroupEqMaskARB:    return spv::BuiltInSubgroupEqMaskARB;
+    case glslang::EbvSubGroupGeMaskARB:    return spv::BuiltInSubgroupGeMaskARB;
+    case glslang::EbvSubGroupGtMaskARB:    return spv::BuiltInSubgroupGtMaskARB;
+    case glslang::EbvSubGroupLeMaskARB:    return spv::BuiltInSubgroupLeMaskARB;
+    case glslang::EbvSubGroupLtMaskARB:    return spv::BuiltInSubgroupLtMaskARB;
+#endif /* NO_GL_ARB_SHADER_BALLOT */
     default:                               return (spv::BuiltIn)spv::BadValue;
     }
 }
@@ -1104,6 +1113,12 @@ bool TGlslangToSpvTraverser::visitUnary(glslang::TVisit /* visit */, glslang::TI
     case glslang::EOpEndStreamPrimitive:
         builder.createNoResultOp(spv::OpEndStreamPrimitive, operand);
         return false;
+#ifndef NO_GL_ARB_SHADER_BALLOT
+    case glslang::EOpballotARB:
+    case glslang::EOpreadFirstInvocationARB:
+        result = createUnaryOperation(node->getOp(), precision, convertGlslangToSpvType(node->getType()), operand, node->getOperand()->getBasicType());
+        return false;
+#endif /* NO_GL_ARB_SHADER_BALLOT */
 
     default:
         spv::MissingFunctionality("unknown glslang unary");
@@ -1737,6 +1752,14 @@ spv::Id TGlslangToSpvTraverser::convertGlslangToSpvType(const glslang::TType& ty
     case glslang::EbtUint:
         spvType = builder.makeUintType(32);
         break;
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+    case glslang::EbtInt64:
+        spvType = builder.makeIntType(64);
+        break;
+    case glslang::EbtUint64:
+        spvType = builder.makeUintType(64);
+        break;
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
     case glslang::EbtAtomicUint:
         spv::TbdFunctionality("Is atomic_uint an opaque handle in the uniform storage class, or an addresses in the atomic storage class?");
         spvType = builder.makeUintType(32);
@@ -1960,6 +1983,7 @@ spv::Id TGlslangToSpvTraverser::makeArraySizeId(const glslang::TArraySizes& arra
     glslang::TIntermTyped* specNode = arraySizes.getDimNode(dim);
     if (specNode != nullptr) {
         builder.clearAccessChain();
+        // SpecConstantOpModeGuard set_to_spec_const_mode(&builder);
         specNode->traverse(this);
         return accessChainLoad(specNode->getAsTyped()->getType());
     }
@@ -2752,6 +2776,12 @@ spv::Id TGlslangToSpvTraverser::createBinaryOperation(glslang::TOperator op, spv
     case glslang::EOpVectorNotEqual:
         comparison = true;
         break;
+#ifndef NO_GL_ARB_gpu_shader_int64
+    case glslang::EOpreadInvocationARB:
+        assert(0); // TBD
+        // libCall = spv::GLSLstd450readInvocationARB;
+        break;
+#endif /* NO_GL_ARB_gpu_shader_int64 */
     default:
         break;
     }
@@ -3193,6 +3223,11 @@ spv::Id TGlslangToSpvTraverser::createUnaryOperation(glslang::TOperator op, spv:
         else
             libCall = spv::GLSLstd450FindSMsb;
         break;
+#ifndef NO_GL_ARB_gpu_shader_int64
+    case glslang::EOpreadFirstInvocationARB:
+        libCall = spv::GLSLstd450readFirstInvocationARB;
+        break;
+#endif /* NO_GL_ARB_gpu_shader_int64 */
 
     default:
         return 0;
@@ -3323,6 +3358,17 @@ spv::Id TGlslangToSpvTraverser::createConversion(glslang::TOperator op, spv::Dec
     case glslang::EOpConvDoubleToUint:
         convOp = spv::OpConvertFToU;
         break;
+
+#ifndef NO_GL_GPU_SHADER_INT64
+    // Truncate or zero extend conversions
+    case glslang::EOpConvUint:
+        convOp = spv::OpUConvert;
+        break;
+    case glslang::EOpConvInt:
+        convOp = spv::OpSConvert;
+        break;
+#endif /* NO_GL_GPU_SHADER_INT64 */
+
     default:
         break;
     }

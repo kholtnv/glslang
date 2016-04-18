@@ -565,6 +565,10 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
         switch (node->getBasicType()) {
         case EbtInt:   newOp = EOpConvIntToDouble;   break;
         case EbtUint:  newOp = EOpConvUintToDouble;  break;
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+        case EbtUint64: newOp = EOpConvIntToBool;    break;
+        case EbtInt64:  newOp = EOpConvUintToBool;    break;
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         case EbtBool:  newOp = EOpConvBoolToDouble;  break;
         case EbtFloat: newOp = EOpConvFloatToDouble; break;
         default:
@@ -575,6 +579,10 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
         switch (node->getBasicType()) {
         case EbtInt:    newOp = EOpConvIntToFloat;    break;
         case EbtUint:   newOp = EOpConvUintToFloat;   break;
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+        case EbtUint64: newOp = EOpConvIntToFloat;    break;
+        case EbtInt64:  newOp = EOpConvUintToFloat;   break;
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         case EbtBool:   newOp = EOpConvBoolToFloat;   break;
         case EbtDouble: newOp = EOpConvDoubleToFloat; break;
         default:
@@ -584,6 +592,9 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     case EbtBool:
         switch (node->getBasicType()) {
         case EbtInt:    newOp = EOpConvIntToBool;    break;
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+        case EbtUint64: newOp = EOpConvIntToBool;    break;
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         case EbtUint:   newOp = EOpConvUintToBool;   break;
         case EbtFloat:  newOp = EOpConvFloatToBool;  break;
         case EbtDouble: newOp = EOpConvDoubleToBool; break;
@@ -592,8 +603,16 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
         }
         break;
     case EbtInt:
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+    case EbtInt64:
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         switch (node->getBasicType()) {
         case EbtUint:   newOp = EOpConvUintToInt;   break;
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+        case EbtUint64: newOp = EOpConvUintToInt;   break;
+        case EbtInt:    newOp = EOpConvInt;         break;
+        case EbtInt64:  newOp = EOpConvInt;         break;
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         case EbtBool:   newOp = EOpConvBoolToInt;   break;
         case EbtFloat:  newOp = EOpConvFloatToInt;  break;
         case EbtDouble: newOp = EOpConvDoubleToInt; break;
@@ -602,8 +621,16 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
         }
         break;
     case EbtUint:
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+    case EbtUint64:
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         switch (node->getBasicType()) {
         case EbtInt:    newOp = EOpConvIntToUint;    break;
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+        case EbtInt64:  newOp = EOpConvIntToUint;    break;
+        case EbtUint:   newOp = EOpConvUint;         break;
+        case EbtUint64: newOp = EOpConvUint;         break;
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
         case EbtBool:   newOp = EOpConvBoolToUint;   break;
         case EbtFloat:  newOp = EOpConvFloatToUint;  break;
         case EbtDouble: newOp = EOpConvDoubleToUint; break;
@@ -674,6 +701,25 @@ bool TIntermediate::canImplicitlyPromote(TBasicType from, TBasicType to) const
         default:
             return false;
         }
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+    case EbtInt64:
+        switch (from) {
+        case EbtInt:
+        case EbtInt64:
+            return true;
+        default:
+            return false;
+        }
+    case EbtUint64:
+        switch (from) {
+        case EbtUint:
+        case EbtInt64:
+        case EbtUint64:
+            return true;
+        default:
+            return false;
+        }
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
     default:
         return false;
     }

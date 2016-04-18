@@ -97,6 +97,10 @@ enum TOperator {
     EOpConvUintToDouble,
     EOpConvFloatToDouble,
     EOpConvBoolToDouble,
+#ifndef NO_GL_ARB_GPU_SHADER_INT64
+    EOpConvInt,
+    EOpConvUint,
+#endif /* NO_GL_ARB_GPU_SHADER_INT64 */
 
     //
     // binary operations
@@ -447,6 +451,12 @@ enum TOperator {
     EOpBitCount,
     EOpFindLSB,
     EOpFindMSB,
+
+#ifndef NO_GL_ARB_SHADER_BALLOT
+    EOpballotARB,
+    EOpreadInvocationARB,
+    EOpreadFirstInvocationARB,
+#endif  /* NO_GL_ARB_SHADER_BALLOT */
 };
 
 class TIntermTraverser;
